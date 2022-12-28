@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// expect divisor of 60
+const UpdateEachMin = 10
+
 type DateValue struct {
 	Date  time.Time `json:"date"`
 	Value float64   `json:"value"`
@@ -35,10 +38,9 @@ type WeatherSummary struct {
 	Id          string    `firestore:"id"`
 	Date        time.Time `firestore:"date"`
 	Count       int       `firestore:"count"`
+	Cache       string    `firestore:"cache"`
 	Temperature Stat      `firestore:"temperature"`
 	Humidity    Stat      `firestore:"humidity"`
 	Atmosphere  Stat      `firestore:"atmosphere"`
 	Co2         Stat      `firestore:"co2"`
 }
-
-

@@ -1,4 +1,4 @@
-module weather_room
+module github.com/Nekodigi/Weather-Room
 
 go 1.19
 

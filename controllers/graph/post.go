@@ -2,27 +2,13 @@ package graph
 
 import (
 	"context"
+	"encoding/json"
 	"log"
-	"net/http"
-	"time"
-	"weather_room/infrastructure"
-	"weather_room/models"
-	"weather_room/utils"
 
-	"github.com/gin-gonic/gin"
+	"github.com/Nekodigi/Weather-Room/infrastructure"
+	"github.com/Nekodigi/Weather-Room/models"
+	"github.com/Nekodigi/Weather-Room/utils"
 )
-
-func POST(ctx *gin.Context) {
-
-	var req models.TWeatherPost
-	ctx.BindJSON(&req)
-	if req.Date.IsZero() {
-		req.Date = utils.JSTNow()
-	}
-	AddData(ctx, req)
-	ctx.String(http.StatusOK, "updated")
-	// /weather/YYMM/datas/hhmm
-}
 
 func AddData(ctx context.Context, req models.TWeatherPost) {
 	client, _ := infrastructure.FirestoreInit(ctx)
@@ -50,12 +36,17 @@ func UpdateStat(ctx context.Context, req models.TWeatherPost) {
 	client, _ := infrastructure.FirestoreInit(ctx)
 
 	var prevSummary models.WeatherSummary
-	ref, err := client.Collection("weathers").Doc(req.Date.Format("060102")).Get(ctx)
-	if err != nil {
+	doc, _ := client.Collection("weathers").Doc(req.Date.Format("060102")).Get(ctx)
+	if doc == nil {
 		log.Println("document not found => create new")
+		var weatherGraphs models.WeatherGraphs
+		utils.AppendGraphData(&weatherGraphs, req)
+		wgJsonByte, _ := json.Marshal(weatherGraphs)
+		log.Println(string(wgJsonByte))
 		weatherSummary := models.WeatherSummary{
 			Id:          req.Date.Format("060102"),
-			Date:        time.Date(req.Date.Year(), req.Date.Month(), req.Date.Day(), 0, 0, 0, 0, utils.JST()),
+			Date:        req.Date,
+			Cache:       string(wgJsonByte),
 			Temperature: models.SameStat(req.Temperature),
 			Humidity:    models.SameStat(req.Humidity),
 			Atmosphere:  models.SameStat(req.Atmosphere),
@@ -69,13 +60,9 @@ func UpdateStat(ctx context.Context, req models.TWeatherPost) {
 		}
 		return
 	}
-	ref.DataTo(&prevSummary)
+	doc.DataTo(&prevSummary)
 
-	utils.UpdateStat(&prevSummary.Temperature, prevSummary.Count, req.Temperature)
-	utils.UpdateStat(&prevSummary.Humidity, prevSummary.Count, req.Humidity)
-	utils.UpdateStat(&prevSummary.Atmosphere, prevSummary.Count, req.Atmosphere)
-	utils.UpdateStat(&prevSummary.Co2, prevSummary.Count, req.Co2)
-	prevSummary.Count++
+	utils.UpdateWeatherSummary(&prevSummary, req)
 
 	{
 		_, err := client.Collection("weathers").Doc(req.Date.Format("060102")).Set(ctx, prevSummary)

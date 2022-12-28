@@ -3,8 +3,9 @@ package indicator
 import (
 	"log"
 	"net/http"
-	"weather_room/infrastructure"
-	"weather_room/models"
+
+	"github.com/Nekodigi/Weather-Room/infrastructure"
+	"github.com/Nekodigi/Weather-Room/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,14 +15,14 @@ func GET(ctx *gin.Context) {
 
 	doc, err := client.Collection("weathers").Doc("latest").Get(ctx)
 	if err != nil {
-		log.Fatalln("cannot get latest")
+		log.Fatalln("Cannot get latest\nPost data first")
 	}
 	var weatherData models.TGetIndicator
 	doc.DataTo(&weatherData)
 
 	doc2, err2 := client.Collection("consts").Doc("weatherCriteria").Get(ctx)
 	if err2 != nil {
-		log.Fatalln("cannot get criteria")
+		log.Fatalln("Cannot get criteria\nPlease set consts/weatherCriteria in firestore")
 	}
 	var weatherCriteria models.WeatherIndicator
 	doc2.DataTo(&weatherCriteria)

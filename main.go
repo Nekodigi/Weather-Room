@@ -5,10 +5,11 @@ import (
 	"math"
 	"os"
 	"time"
-	"weather_room/controllers/graph"
-	handler "weather_room/handlers"
-	"weather_room/models"
-	"weather_room/utils"
+
+	"github.com/Nekodigi/Weather-Room/controllers/graph"
+	handler "github.com/Nekodigi/Weather-Room/handlers"
+	"github.com/Nekodigi/Weather-Room/models"
+	"github.com/Nekodigi/Weather-Room/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +23,7 @@ func main() {
 	} else {
 		engine := gin.Default()
 		handler.Router(engine)
-		engine.Run(":3000")
+		engine.Run(":8080")
 	}
 }
 

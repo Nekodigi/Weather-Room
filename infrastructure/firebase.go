@@ -18,10 +18,11 @@ func FirestoreInit(ctx context.Context) (*firestore.Client, error) {
 		log.Println("APP")
 		log.Fatalln(err)
 	}
+	//log.Println(sa)
 
 	client, err := app.Firestore(ctx)
 	if err != nil {
-		log.Println("Firestore")
+		log.Println("Firestore init error")
 		log.Fatalln(err)
 		return nil, err
 	}

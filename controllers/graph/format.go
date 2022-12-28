@@ -1,6 +1,6 @@
 package graph
 
-import "weather_room/models"
+import "github.com/Nekodigi/Weather-Room/models"
 
 func WeatherDataToGraph(weatherDatas []models.WeatherData) models.WeatherGraphs {
 	var weatherGraphs models.WeatherGraphs
